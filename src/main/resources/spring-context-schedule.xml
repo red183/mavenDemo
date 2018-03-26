@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd"
+	   default-lazy-init="true">
+	
+	<!-- =================== 任务配置 =================== -->
+	<!-- 任务1：案例任务 -->
+	<!--
+	<bean id="demoFireJob" class="com.cnwanweb.quickframework.modules.quartz.jobs.DemoFireJob"></bean>
+	<bean id="demoFireJobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass" value="com.cnwanweb.quickframework.modules.quartz.common.FireStateQuartzStatefulJob" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="beanName" value="demoFireJob" />
+				<entry key="targetMethod" value="execute" />
+				<entry key="shouldRecover" value="true" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+		<property name="group"><value>系统默认</value></property>
+		<property name="name"><value>文件检验</value></property>
+	</bean>
+	<bean id="demoJobTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<ref bean="demoFireJobDetail"/>
+		</property>
+		<property name="name"><value>demoJobTrigger</value></property>
+		<property name="cronExpression">
+			<value>0/10 * * * * ?</value>
+		</property>
+	</bean>
+
+	<bean id="howToWriteJob" class="com.cnwanweb.quickframework.modules.test.quartz.HowToWriteJob"></bean>
+	<bean id="howToWriteJobDetail" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass" value="com.cnwanweb.quickframework.modules.quartz.common.FireStateQuartzStatefulJob" />
+		<property name="jobDataAsMap">
+			<map>
+				<entry key="beanName" value="howToWriteJob" />
+				<entry key="targetMethod" value="execute" />
+				<entry key="shouldRecover" value="true" />
+			</map>
+		</property>
+		<property name="durability" value="true" />
+		<property name="group"><value>系统默认</value></property>
+		<property name="name"><value>教你学写定时器</value></property>
+	</bean>
+	<bean id="howToWriteJobTrigger" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<ref bean="howToWriteJobDetail"/>
+		</property>
+		<property name="name"><value>howToWriteJobTrigger</value></property>
+		<property name="cronExpression">
+			<value>5 * * * * ?</value>
+		</property>
+	</bean>
+	-->
+	<!-- 定义触发器 -->
+	<!-- init-method="start" destroy-method="stop" -->
+	<bean id="schedulerFactoryBean" lazy-init="false" destroy-method="stop" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="configLocation" value="classpath:quartz.properties"/>
+		<property name="dataSource" ref ="dataSource" />
+		<property name="applicationContextSchedulerContextKey" value="applicationContextKey"/>
+		<property name="startupDelay" value="0"/>
+		<!-- <property name="overwriteExistingJobs" value="false"/> -->
+		<!--<property name="quartzProperties">
+			<props>
+				<prop key="org.quartz.scheduler.skipUpdateCheck">true</prop>
+			</props>
+		</property>-->
+		<property name="triggers">
+			<list>
+				<!--
+				<ref bean="demoJobTrigger" />
+				<ref bean="howToWriteJobTrigger" />
+				-->
+			</list>
+		</property>
+	</bean>
+</beans>

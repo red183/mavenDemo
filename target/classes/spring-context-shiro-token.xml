@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context" xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+		http://www.springframework.org/schema/context  http://www.springframework.org/schema/context/spring-context-4.0.xsd"
+	default-lazy-init="true">
+
+	<description>Shiro Configuration for API</description>
+
+    <!-- 加载配置属性文件 -->
+	<context:property-placeholder ignore-unresolvable="true" location="classpath:application.properties" />
+	
+	<!-- 安全认证过滤器 -->
+	<bean id="tokenShiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+		<property name="securityManager" ref="apiTokenSecurityManager" />
+		<property name="filters">
+            <map>
+                <entry key="apiAuthc" value-ref="apiTokenAuthenticationFilter"/>
+				<entry key="wxWareAuthc" value-ref="wxWareAuthenticationFilter"/>
+            </map>
+        </property>
+		<property name="filterChainDefinitions">
+			<value>
+				/api/** = apiAuthc
+				/wx/ware/** = wxWareAuthc
+			</value>
+		</property>
+	</bean>
+
+	<!-- 安全认证过滤器
+	<bean id="wxWareShiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+		<property name="securityManager" ref="wxWareTokenSecurityManager" />
+		<property name="filters">
+			<map>
+				<entry key="wxWareAuthc" value-ref="wxWareAuthenticationFilter"/>
+			</map>
+		</property>
+		<property name="filterChainDefinitions">
+			<value>
+				/wx/ware/** = wxWareAuthc
+			</value>
+		</property>
+	</bean> -->
+
+	<!-- 定义Shiro安全管理配置 -->
+	<bean id="apiTokenSecurityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+		<property name="realm" ref="apiTokenRealm" />
+		<property name="sessionManager" ref="apiTokenSessionManager" />
+		<property name="cacheManager" ref="shiroCacheManager" />
+	</bean>
+
+	<!--<bean id="wxWareTokenSecurityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+		<property name="realm" ref="apiTokenRealm" />
+		<property name="sessionManager" ref="apiTokenSessionManager" />
+		<property name="cacheManager" ref="shiroCacheManager" />
+	</bean>-->
+
+	<!-- 安全管理器
+	<bean id="apiTokenSecurityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+		<property name="realm" ref="apiTokenRealm"/>
+		<property name="subjectDAO.sessionStorageEvaluator.sessionStorageEnabled" value="false"/>
+		<property name="subjectFactory" ref="apiTokenSubjectFactory"/>
+		<property name="sessionManager" ref="apiTokenSessionManager"/>
+	</bean>
+
+	<bean id="wxWareTokenSecurityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+		<property name="realm" ref="wxWareRealm"/>
+		<property name="subjectDAO.sessionStorageEvaluator.sessionStorageEnabled" value="false"/>
+		<property name="subjectFactory" ref="apiTokenSubjectFactory"/>
+		<property name="sessionManager" ref="apiTokenSessionManager"/>
+	</bean>
+	-->
+
+	<!-- Realm 实现 -->
+	<bean id="apiTokenRealm"
+		  class="com.cnwanweb.quickframework.modules.sys.security.ApiTokenRealm">
+		<property name="cachingEnabled" value="false"/>
+	</bean>
+
+	<!--<bean id="wxWareRealm"
+		  class="com.cnwanweb.quickframework.modules.sys.security.WxWareRealm">
+		<property name="cachingEnabled" value="false"/>
+	</bean>-->
+
+	<!-- Subject 工厂
+	<bean id="apiTokenSubjectFactory"
+		  class="com.cnwanweb.quickframework.modules.sys.security.ApiTokenDefaultSubjectFactory"/>
+ 	-->
+
+	<!-- 会话管理器
+	<bean id="apiTokenSessionManager" class="org.apache.shiro.session.mgt.DefaultSessionManager">
+		<property name="sessionValidationSchedulerEnabled" value="false"/>
+	</bean> -->
+
+	<bean id="apiTokenSessionManager" class="com.cnwanweb.quickframework.common.security.shiro.session.SessionManager">
+		<property name="sessionDAO" ref="sessionDAO"/>
+
+		<!-- 会话超时时间，单位：毫秒  -->
+		<property name="globalSessionTimeout" value="7200"/>
+
+		<!-- 定时清理失效会话, 清理用户直接关闭浏览器造成的孤立会话   -->
+		<property name="sessionValidationInterval" value="7200"/>
+		<!-- <property name="sessionValidationSchedulerEnabled" value="false"/> -->
+		<property name="sessionValidationSchedulerEnabled" value="true"/>
+		<property name="sessionIdCookieEnabled" value="false"/>
+	</bean>
+</beans>

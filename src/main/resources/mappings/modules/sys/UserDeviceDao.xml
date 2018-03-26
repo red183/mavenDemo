@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.cnwanweb.quickframework.modules.sys.dao.UserDeviceDao">
+    
+	<sql id="userDeviceColumns">
+		a.id AS "id",
+		a.user_id AS "user.id",
+		a.device_id AS "deviceId",
+		a.protocol AS "protocol",
+		a.os_name AS "osName",
+		a.os_version AS "osVersion",
+		a.device_brand AS "deviceBrand",
+		a.device_name AS "deviceName",
+		a.soft_version AS "softVersion",
+		a.create_by AS "createBy.id",
+		a.create_date AS "createDate",
+		a.update_by AS "updateBy.id",
+		a.update_date AS "updateDate",
+		a.remarks AS "remarks",
+		a.del_flag AS "delFlag",
+		u2.name AS "user.name",
+		u2.phone AS "user.phone"
+	</sql>
+	
+	<sql id="userDeviceJoins">
+		LEFT JOIN sys_user u2 ON u2.id = a.user_id
+	</sql>
+    
+	<select id="get" resultType="UserDevice">
+		SELECT 
+			<include refid="userDeviceColumns"/>
+		FROM sys_user_device a
+		<include refid="userDeviceJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="UserDevice">
+		SELECT 
+			<include refid="userDeviceColumns"/>
+		FROM sys_user_device a
+		<include refid="userDeviceJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="user != null and user.id != null and user.id != ''">
+				AND a.user_id = #{user.id}
+			</if>
+			<if test="user != null and user.name != null and user.name != ''">
+				AND u2.name LIKE concat('%',#{user.name},'%')
+			</if>
+			<if test="user != null and user.phone != null and user.phone != ''">
+				AND u2.phone LIKE concat('%',#{user.phone},'%')
+			</if>
+			<if test="protocol != null and protocol != ''">
+				AND a.protocol LIKE
+					<if test="dbName == 'oracle'">'%'||#{protocol}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{protocol}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{protocol},'%')</if>
+			</if>
+			<if test="osName != null and osName != ''">
+				AND a.os_name LIKE
+					<if test="dbName == 'oracle'">'%'||#{osName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{osName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{osName},'%')</if>
+			</if>
+			<if test="osVersion != null and osVersion != ''">
+				AND a.os_version LIKE
+				<if test="dbName == 'oracle'">'%'||#{osVersion}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{osVersion}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{osVersion},'%')</if>
+			</if>
+			<if test="deviceBrand != null and deviceBrand != ''">
+				AND a.device_brand LIKE
+				<if test="dbName == 'oracle'">'%'||#{deviceBrand}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{deviceBrand}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{deviceBrand},'%')</if>
+			</if>
+			<if test="deviceId != null and deviceId != ''">
+				AND a.device_id = #{deviceId}
+			</if>
+			<if test="deviceName != null and deviceName != ''">
+				AND a.device_name LIKE
+				<if test="dbName == 'oracle'">'%'||#{deviceName}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{deviceName}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{deviceName},'%')</if>
+			</if>
+			<if test="softVersion != null and softVersion != ''">
+				AND a.soft_version LIKE
+				<if test="dbName == 'oracle'">'%'||#{softVersion}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{softVersion}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{softVersion},'%')</if>
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.create_date ASC
+			</otherwise>
+		</choose>
+	</select>
+	<!-- 不要修改上句中的 ORDER BY a.create_date ASC；它在登录判断判定设备上有用； -->
+	
+	<select id="findAllList" resultType="UserDevice">
+		SELECT 
+			<include refid="userDeviceColumns"/>
+		FROM sys_user_device a
+		<include refid="userDeviceJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO sys_user_device(
+			id,
+			user_id,
+			device_id,
+			protocol,
+			os_name,
+			os_version,
+			device_brand,
+			device_name,
+			soft_version,
+			create_by,
+			create_date,
+			update_by,
+			update_date,
+			remarks,
+			del_flag
+		) VALUES (
+			#{id},
+			#{user.id},
+			#{deviceId},
+			#{protocol},
+			#{osName},
+			#{osVersion},
+			#{deviceBrand},
+			#{deviceName},
+			#{softVersion},
+			#{createBy.id},
+			#{createDate},
+			#{updateBy.id},
+			#{updateDate},
+			#{remarks},
+			#{delFlag}
+		)
+	</insert>
+
+	<insert id="insertHistory">
+		INSERT INTO sys_user_device_history(
+			id,
+			user_id,
+			device_id,
+			protocol,
+			os_name,
+			os_version,
+			device_brand,
+			device_name,
+			soft_version,
+			create_date
+		) VALUES (
+			#{id},
+			#{user.id},
+			#{deviceId},
+			#{protocol},
+			#{osName},
+			#{osVersion},
+			#{deviceBrand},
+			#{deviceName},
+			#{softVersion},
+			#{createDate}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE sys_user_device SET 	
+			user_id = #{user.id},
+			protocol = #{protocol},
+			os_name = #{osName},
+			os_version = #{osVersion},
+			device_brand = #{deviceBrand},
+			device_name = #{deviceName},
+			soft_version = #{softVersion},
+			update_by = #{updateBy.id},
+			update_date = #{updateDate},
+			remarks = #{remarks},
+			del_flag = #{delFlag}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE sys_user_device SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+
+
+	<delete id="deleteUserDeviceExceptForId">
+         delete from sys_user_device where user_id = #{user.id} and id in
+            (select id from (
+		 	select a.id from sys_user_device a
+         	inner join (
+         		select user_id, min(update_date) update_date
+         		from sys_user_device b group by user_id
+         	) b on a.user_id=b.user_id and a.update_date > b.update_date
+            ) t)
+	</delete>
+
+	<delete id="deleteTheUserDevice">
+		DELETE from sys_user_device
+		where id=#{id}
+	</delete>
+
+	<delete id="updateUserDeviceBinds">
+		DELETE from sys_user_device
+		where id IN
+		<foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+	
+</mapper>

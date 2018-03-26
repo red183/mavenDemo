@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: kingdee.bos:webapi:20180107">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/kingdee/bos/webapi/20180107/webapi-20180107.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/kingdee/bos/webapi/20180107/webapi-20180107-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/kingdee/bos/webapi/20180107/webapi-20180107-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
